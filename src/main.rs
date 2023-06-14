@@ -5,6 +5,8 @@ fn main() {
    render(); 
 }
 
+fn hit_sphere
+
 fn render(){
     //P3 framebuffer
     let width: u32 = 1024;

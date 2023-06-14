@@ -148,7 +148,6 @@ impl std::ops::Div<f32> for Vec3 {
     }
 }
 
-
 impl std::ops::AddAssign<Vec3> for Vec3 {
     fn add_assign(&mut self, other: Vec3) {
         self.e[0] += other.e[0];
