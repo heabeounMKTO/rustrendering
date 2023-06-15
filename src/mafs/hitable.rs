@@ -13,7 +13,6 @@
                            p: Vec3::new(0.0,0.0,0.0), normal: Vec3::new(0.0,0.0,0.0) };
     }
  }
-
  pub trait Hitable{
     fn hit(&self, t: Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
  }
