@@ -9,13 +9,19 @@ fn main() {
 
 
 fn ray_color(ray: Ray) -> Color{
-    if(hit_sphere(Vec3::new(0.0,0.0,-1.0), 0.5, ray)) {
+    let t :f32 = hit_sphere(Vec3::new(0.0,0.0,-1.0), 0.4, ray);
+    if (t > 0.0){
+        let N: Vec3 = Vec3::make_unit_vector(
+                        ray.point_at_parameter(t) - Vec3::new(0.0,0.0,-1.0));
         return Color{
-            r: 0.5,
-            g:0.5,
-            b:0.5
-        }
+                r: 0.5*(N.x()+1.0), 
+                g: 0.5*(N.y()+1.0),
+                b: 0.5*(N.z()+1.0),
+                } 
+        
     }
+        
+    
     let unit_direction: Vec3 = Vec3::make_unit_vector(ray.direction());
     let t = 0.5*(unit_direction.y() + 1.0);
     let bg: Color = Color::new(1.0,1.0,1.0);
@@ -25,16 +31,20 @@ fn ray_color(ray: Ray) -> Color{
               g: (1.0-t)*bg.g + t*fg.g, 
               b: (1.0-t)*bg.b + t*fg.b 
            } ; 
-        
-}
+}  
 
-fn hit_sphere(center: Vec3, radius: f32, r:Ray) -> bool{
+
+fn hit_sphere(center: Vec3, radius: f32, r:Ray) -> f32{
     let oc: Vec3 = r.origin() - center;
-    let a = Vec3::dot(&r.direction(), &r.direction());
-    let b = 2.0*Vec3::dot(&oc, &r.direction());
-    let c = Vec3::dot(&oc, &oc) - radius * radius;
-    let discriminant = b*b - 4.0*a*c;
-    return(discriminant > 0.0);
+    let a = r.direction().squared_length();
+    let half_b = Vec3::dot(&oc, &r.direction());
+    let c = oc.squared_length() - radius * radius;
+    let discriminant = half_b*half_b - 4.0*a*c;
+    if(discriminant < 0.0){
+        return -1.0;
+    }else{
+        return(-half_b - f32::sqrt(discriminant)) / (2.0*a);
+    }
 }
 fn render(){
     const ASPECT_RATIO: f32 = 16.0/9.0;
