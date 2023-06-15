@@ -1,6 +1,7 @@
  use super::vec::Vec3;
  use super::ray::Ray;
 
+#[derive(Copy, Clone, Debug)]
  pub struct HitRecord{
     pub t: f32,
     pub p: Vec3,
@@ -14,5 +15,5 @@
     }
  }
  pub trait Hitable{
-    fn hit(&self, t: Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
+    fn hit(&self, t: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool;
  }
