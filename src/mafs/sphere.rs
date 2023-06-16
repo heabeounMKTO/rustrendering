@@ -1,7 +1,7 @@
 use super::vec::Vec3;
 use super::hitable::*;
 use super::ray::*;
-struct Sphere{
+pub struct Sphere{
     pub center: Vec3,
     pub radius: f32
 }
@@ -18,21 +18,22 @@ impl Hitable for Sphere{
         let a = r.direction().squared_length();
         let half_b = Vec3::dot(&oc, &r.direction());
         let c = oc.squared_length() - self.radius * self.radius;
-        let discriminant = half_b*half_b - a*c;
-        let sqrtd: f32 = f32::sqrt(discriminant);
+        let discriminant = (half_b*half_b - a*c).abs(); // added abs for debugging
+        let sqrtd: f32 = discriminant.sqrt();
         let mut root = (-half_b - sqrtd) / a;
-        if (discriminant < 0.0){
-            return false;
-        }
-        if(root < t_min && t_max < root){
+        
+        // println!("dbg sphere {:?}", &root);
+        if (root < t_min || t_max < root){
             root = (-half_b + sqrtd)/a;
-            if(root < t_min && t_max < root){
+            if(root < t_min || t_max < root){
                 return false;
             };
         };
         rec.t = root;
         rec.p = r.point_at_parameter(rec.t);
-        rec.normal = (rec.p - self.center) / self.radius;
+        let outward_normal: Vec3 = (rec.p - self.center)/self.radius;
+        
+        rec.set_face_normal(r, outward_normal);
         return true;
     }
 }
