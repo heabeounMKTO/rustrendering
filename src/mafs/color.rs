@@ -1,5 +1,5 @@
 use super::vec::Vec3;
-
+use super::mafsconsts::clamp;
 #[derive(Copy, Clone, Debug)]
 pub struct Pixel_color{
    pub r: u32,
@@ -8,9 +8,9 @@ pub struct Pixel_color{
 }
 #[derive(Copy, Clone, Debug)]
 pub struct Color{
-    pub r: f32,
-    pub g: f32,
-    pub b: f32
+    pub r: f64,
+    pub g: f64,
+    pub b: f64
 }
 impl Pixel_color{
     pub fn new(r: u32, g: u32, b: u32) -> Pixel_color{
@@ -19,14 +19,14 @@ impl Pixel_color{
 }
 
 impl Color{
-    pub fn new(r: f32, g: f32, b: f32) -> Color{
+    pub fn new(r: f64, g: f64, b: f64) -> Color{
         return Color{r: r, g: g, b: b};
     }
 
-    pub fn add_color(&self, color: Color) -> Color{
-        let ar = self.r + color.r;
-        let ag = self.g + color.g;
-        let ab = self.b + color.b;
+    pub fn add_color(color: Color, color1: Color) -> Color{
+        let ar = color.r + color1.r;
+        let ag = color.g + color1.g;
+        let ab = color.b + color1.b;
         return Color{
             r: ar,
             g: ag,
@@ -34,10 +34,18 @@ impl Color{
         };
     }
 
-    pub fn write_color(&self) -> Pixel_color{
-        let pixel_r = (255.99 * self.r) as u32;
-        let pixel_g = (255.99 * self.g) as u32;
-        let pixel_b = (255.99 * self.b) as u32;
+    pub fn write_color(&self, pixel_color: Color ,  samples: f64) -> Pixel_color{
+        let mut r: f64 = pixel_color.r;
+        let mut g: f64 = pixel_color.g;
+        let mut b: f64 = pixel_color.b;
+
+        let scale: f64 = 1.0 / samples;
+        r *= scale;
+        g *= scale;
+        b *= scale;
+        let pixel_r =  (256.0 * clamp(r, 0.0, 0.999)) as u32;
+        let pixel_g =  (256.0 * clamp(g, 0.0, 0.999)) as u32;
+        let pixel_b =  (256.0 * clamp(b, 0.0, 0.999)) as u32;
         return Pixel_color { r: pixel_r, g: pixel_g, b: pixel_b };
     }
 }

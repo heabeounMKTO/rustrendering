@@ -19,8 +19,8 @@ impl HitableList{
 }
 
 impl Hitable for HitableList{
-    fn hit(&self, r: Ray, t_min: f32,
-           t_max: f32) -> Option<HitRecord>{
+    fn hit(&self, r: Ray, t_min: f64,
+           t_max: f64) -> Option<HitRecord>{
             let mut hit_anything = None;
             let mut closest_so_far = t_max;
             for i in &self.spheres{
