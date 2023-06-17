@@ -15,7 +15,7 @@ fn main() {
 
 
 fn ray_color(r: Ray, world: &HitableList, depth: f64) -> Color{
-    match world.hit(r, 0.0, INFINITY){
+    match world.hit(r, 0.001, INFINITY){
         // if there is sphere , return normals
 
         
@@ -27,7 +27,7 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64) -> Color{
                     b: 0.0
                 }
             }
-            let target: Vec3 = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+            let target: Vec3 = rec.p + rec.normal + Vec3::random_unit_vector();
             
             let final_color: Color =  ray_color(Ray::new(rec.p, target - rec.p), world, depth-1.0);
             // println!("{:?}",&final_color);
