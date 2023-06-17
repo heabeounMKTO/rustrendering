@@ -1,20 +1,20 @@
 use super::{vec::Vec3, ray::Ray};
 
 pub struct Camera{
-    pub view_h: f32,
-    pub view_w: f32,
+    pub view_h: f64,
+    pub view_w: f64,
     pub origin: Vec3,
-    pub focal_length: f32,
+    pub focal_length: f64,
     pub horizontal: Vec3,
     pub vertical: Vec3,
     pub lower_left_c: Vec3
 }
 
 impl Camera{
-    pub fn new(view_h: f32, 
-               view_w: f32,
+    pub fn new(view_h: f64, 
+               view_w: f64,
                origin: Vec3, 
-               focal_length: f32) -> Camera{
+               focal_length: f64) -> Camera{
                let horizontal: Vec3 = Vec3::new(view_w,0.0,0.0);
                let vertical: Vec3 = Vec3::new(0.0, view_h, 0.0);
                let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3::new(0.0, 0.0, focal_length);
@@ -28,7 +28,7 @@ impl Camera{
                     lower_left_c: lower_left_corner,
                 };
                } 
-    pub fn get_ray(&self,u: f32, v: f32) -> Ray{
+    pub fn get_ray(&self,u: f64, v: f64) -> Ray{
         return Ray{
             origin: self.origin,
             direction: self.lower_left_c + u*self.horizontal + v*self.vertical - self.origin

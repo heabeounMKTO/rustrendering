@@ -8,9 +8,9 @@ pub struct Pixel_color{
 }
 #[derive(Copy, Clone, Debug)]
 pub struct Color{
-    pub r: f32,
-    pub g: f32,
-    pub b: f32
+    pub r: f64,
+    pub g: f64,
+    pub b: f64
 }
 impl Pixel_color{
     pub fn new(r: u32, g: u32, b: u32) -> Pixel_color{
@@ -19,7 +19,7 @@ impl Pixel_color{
 }
 
 impl Color{
-    pub fn new(r: f32, g: f32, b: f32) -> Color{
+    pub fn new(r: f64, g: f64, b: f64) -> Color{
         return Color{r: r, g: g, b: b};
     }
 
@@ -34,12 +34,12 @@ impl Color{
         };
     }
 
-    pub fn write_color(&self, pixel_color: Color ,  samples: f32) -> Pixel_color{
-        let mut r: f32 = pixel_color.r;
-        let mut g: f32 = pixel_color.g;
-        let mut b: f32 = pixel_color.b;
+    pub fn write_color(&self, pixel_color: Color ,  samples: f64) -> Pixel_color{
+        let mut r: f64 = pixel_color.r;
+        let mut g: f64 = pixel_color.g;
+        let mut b: f64 = pixel_color.b;
 
-        let scale: f32 = 1.0 / samples;
+        let scale: f64 = 1.0 / samples;
         r *= scale;
         g *= scale;
         b *= scale;
