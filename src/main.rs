@@ -15,7 +15,7 @@ fn main() {
 
 
 fn ray_color(r: Ray, world: &HitableList, depth: f64) -> Color{
-    match world.hit(r, 0.0, INFINITY){
+    match world.hit(r, 0.001, INFINITY){
         // if there is sphere , return normals
 
         
@@ -27,7 +27,7 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64) -> Color{
                     b: 0.0
                 }
             }
-            let target: Vec3 = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+            let target: Vec3 = rec.p + rec.normal + Vec3::random_unit_vector();
             
             let final_color: Color =  ray_color(Ray::new(rec.p, target - rec.p), world, depth-1.0);
             // println!("{:?}",&final_color);
@@ -56,8 +56,8 @@ fn render(){
     const ASPECT_RATIO: f64 = 16.0/9.0;
     const HEIGHT: u32 = 400; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
-    const SAMPLES: f64 = 500.0;
-    const MAX_DEPTH: f64 = 50.0;
+    const SAMPLES: f64 = 100.0;
+    const MAX_DEPTH: f64 = 20.0;
     //P3 framebuffer
     println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
     let mut world: HitableList = HitableList::new(4);

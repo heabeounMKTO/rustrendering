@@ -49,6 +49,11 @@ impl Vec3{
         }
     }
 
+    pub fn random_unit_vector() -> Vec3{
+        let fuck: Vec3 = Vec3::random_in_unit_sphere();
+        return Vec3::make_unit_vector(fuck);
+    }
+
     pub fn make_unit_vector(v : Vec3)->Vec3{
         v / v.length()
     }

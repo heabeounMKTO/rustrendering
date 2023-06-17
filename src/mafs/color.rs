@@ -1,5 +1,6 @@
 use super::vec::Vec3;
 use super::mafsconsts::clamp;
+use super::color_transforms::*;
 #[derive(Copy, Clone, Debug)]
 pub struct Pixel_color{
    pub r: u32,
@@ -39,13 +40,20 @@ impl Color{
         let mut g: f64 = pixel_color.g;
         let mut b: f64 = pixel_color.b;
 
+
         let scale: f64 = 1.0 / samples;
-        r *= scale;
-        g *= scale;
-        b *= scale;
-        let pixel_r =  (256.0 * clamp(r, 0.0, 0.999)) as u32;
-        let pixel_g =  (256.0 * clamp(g, 0.0, 0.999)) as u32;
-        let pixel_b =  (256.0 * clamp(b, 0.0, 0.999)) as u32;
+        //apply aces on linear color
+        // got transform func from shadertoy somewhere lol
+        r = apply_aces(scale * r);
+        g = apply_aces(scale * g);
+        b = apply_aces(scale * b);
+    
+
+        let pixel_r =  (256.0 * clamp(r, 0.0, 1.0)) as u32;
+        let pixel_g =  (256.0 * clamp(g, 0.0, 1.0)) as u32;
+        let pixel_b =  (256.0 * clamp(b, 0.0, 1.0)) as u32;
         return Pixel_color { r: pixel_r, g: pixel_g, b: pixel_b };
     }
+
+
 }
