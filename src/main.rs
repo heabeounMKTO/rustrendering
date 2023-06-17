@@ -12,35 +12,23 @@ fn main() {
 }
 
 
-fn ray_color(ray: Ray, world: &HitableList) -> Color{
-    let mut rec = HitRecord::new(0.0,Vec3::new(0.0,0.0,0.0),
-                                             Vec3::new(0.0,0.0,0.0) 
-                                             );
-    
-    // println!("{:?}", rec);
-    let hit_bool = world.hit(ray,
-                                   0.0,
-                                   INFINITY,
-                                   &mut rec.to_owned());
-    
-    // println!("{}", hit_bool);
-    match hit_bool{
-        false => {
+fn ray_color(r: Ray, world: &HitableList) -> Color{
+    match world.hit(r, 0.0, INFINITY){
+        Some(rec) =>{
             return Color{
-            r: 0.5 * (rec.normal.x() + 1.0),   
-            g: 0.5 * (rec.normal.y() + 1.0),
-            b: 0.5 * (rec.normal.z() + 1.0),
+                r: 0.5 * (rec.normal.x() + 1.0),
+                g: 0.5 * (rec.normal.y() + 1.0),
+                b: 0.5 * (rec.normal.z() + 1.0),
             }
         }
-        true =>{
-        let ray_direction = Vec3::make_unit_vector(ray.direction());
-        let t = 0.5 * (ray_direction.y() + 1.0);
-        return Color{
-            r: (1.0-t)*1.0 + t*0.5,   
-            g: (1.0-t)*1.0 + t*0.7,
-            b: (1.0-t)*1.0 + t*1.0,
-        } 
- 
+        None => {
+            let unit_direction = Vec3::make_unit_vector(r.direction());
+            let t = 0.5 * (unit_direction.y() + 1.0);
+            return Color{
+                r: (1.0-t) * 1.0 + t*0.5,
+                g: (1.0-t) * 1.0 + t*0.7,
+                b: (1.0-t) * 1.0 + t*1.0,
+            }
         }
     } 
 } 
@@ -64,11 +52,21 @@ fn render(){
     const WIDTH: u32 = (HEIGHT as f32 * (ASPECT_RATIO) ) as u32;
     //P3 framebuffer
     println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
-    let mut world: HitableList = HitableList::new(3);
+    let mut world: HitableList = HitableList::new(2);
     // world.add(Box::new
     //          (Sphere::new(Vec3::new(1.0, 0.0, 0.5), 0.5)));
+    
+    
+    // let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
+    // let horizontal = Vec3::new(4.0, 0.0, 0.0);
+    // let vertical = Vec3::new(0.0, 2.0, 0.0);
+    // let origin = Vec3::new(0.0, 0.0, 0.0);
+    
+    
+    world.add(Box::new(Sphere::new(Vec3::new(0.2, 0.0, -0.2), 0.1)));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
 
-    world.add(Box::new(Sphere::new(Vec3::new(-0.12, 5.0, 15.0), 0.15)));
     
     for j in(0..HEIGHT).rev(){
         for i in 0..WIDTH{
@@ -77,9 +75,9 @@ fn render(){
             let cam: Camera = Camera::new(2.0,
                                           ASPECT_RATIO*2.0,
                                           Vec3::new(0.0,0.0,0.0),
-                                          1.0);
-            let penisRay: Ray = Ray::new(cam.origin, cam.lower_left_c + u*cam.horizontal 
-                                        + v*cam.vertical - cam.origin);
+                                          2.0);
+            let penisRay: Ray = Ray::new(cam.origin,
+                                         cam.lower_left_c + u*cam.horizontal + v*cam.vertical);
             let peniscolor: Color = ray_color(penisRay, &world);
             
             let write_col = peniscolor.write_color();

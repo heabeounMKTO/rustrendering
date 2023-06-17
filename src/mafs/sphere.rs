@@ -1,3 +1,5 @@
+
+
 use super::vec::Vec3;
 use super::hitable::*;
 use super::ray::*;
@@ -13,27 +15,30 @@ impl Sphere{
 }
 
 impl Hitable for Sphere{
-    fn hit(&self, r: Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool{
+    fn hit(&self, r: Ray, t_min: f32, t_max: f32) -> Option<HitRecord>{
         let oc: Vec3 = r.origin() - self.center;
         let a = r.direction().squared_length();
         let half_b = Vec3::dot(&oc, &r.direction());
         let c = oc.squared_length() - self.radius * self.radius;
         let discriminant = (half_b*half_b - a*c).abs(); // added abs for debugging
-        let sqrtd: f32 = discriminant.sqrt();
-        let mut root = (-half_b - sqrtd) / a;
-        
-        // println!("dbg sphere {:?}", &root);
-        if (root < t_min || t_max < root){
-            root = (-half_b + sqrtd)/a;
-            if(root < t_min || t_max < root){
-                return false;
-            };
-        };
-        rec.t = root;
-        rec.p = r.point_at_parameter(rec.t);
-        let outward_normal: Vec3 = (rec.p - self.center)/self.radius;
-        
-        rec.set_face_normal(r, outward_normal);
-        return true;
+        if discriminant > 0.0{
+           let temp = (-half_b - f32::sqrt(half_b*half_b - a*c))/a;
+           if temp < t_max && temp > t_min{
+            let t = temp;
+            let p = r.point_at_parameter(t);
+            let normal = (p - self.center) / self.radius;
+            return Some(HitRecord{t, p, normal});
+           };
+           let temp = (-half_b + f32::sqrt(half_b*half_b-a*c))/a;
+           if temp < t_max && temp > t_min{
+            let t = temp;
+            let p = r.point_at_parameter(t);
+            let normal = (p - self.center) / self.radius;
+            return Some(HitRecord{t, p, normal});
+           };
+
+        }
+       None 
+
     }
 }
