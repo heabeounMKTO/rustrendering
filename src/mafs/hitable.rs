@@ -17,15 +17,6 @@
                            };
     }
 
-   //  pub fn set_face_normal(&mut self ,ray: Ray, outward_normal: Vec3) -> (){
-   //    self.front_face = Vec3::dot(&ray.direction(), &outward_normal) < 0.0;
-      
-   //    if self.front_face == true {
-   //       self.normal = outward_normal
-   //    }else{
-   //        self.normal = -outward_normal
-   //       };
-   // }
  }
  pub trait Hitable{
     fn hit(&self, t: Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;

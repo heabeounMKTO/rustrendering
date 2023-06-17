@@ -1,4 +1,4 @@
-use super::vec::Vec3;
+use super::{vec::Vec3, ray::Ray};
 
 pub struct Camera{
     pub view_h: f32,
@@ -28,4 +28,10 @@ impl Camera{
                     lower_left_c: lower_left_corner,
                 };
                } 
+    pub fn get_ray(&self,u: f32, v: f32) -> Ray{
+        return Ray{
+            origin: self.origin,
+            direction: self.lower_left_c + u*self.horizontal + v*self.vertical - self.origin
+        };
+    }
 }
