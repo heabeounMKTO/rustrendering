@@ -56,8 +56,8 @@ fn render(){
     const ASPECT_RATIO: f64 = 16.0/9.0;
     const HEIGHT: u32 = 400; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
-    const SAMPLES: f64 = 500.0;
-    const MAX_DEPTH: f64 = 50.0;
+    const SAMPLES: f64 = 100.0;
+    const MAX_DEPTH: f64 = 20.0;
     //P3 framebuffer
     println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
     let mut world: HitableList = HitableList::new(4);

@@ -40,9 +40,9 @@ impl Color{
         let mut b: f64 = pixel_color.b;
 
         let scale: f64 = 1.0 / samples;
-        r *= scale;
-        g *= scale;
-        b *= scale;
+        r = f64::sqrt(scale * r);
+        g = f64::sqrt(scale * g);
+        b = f64::sqrt(scale * b);
         let pixel_r =  (256.0 * clamp(r, 0.0, 0.999)) as u32;
         let pixel_g =  (256.0 * clamp(g, 0.0, 0.999)) as u32;
         let pixel_b =  (256.0 * clamp(b, 0.0, 0.999)) as u32;
