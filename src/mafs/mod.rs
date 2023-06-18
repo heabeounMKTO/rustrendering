@@ -7,3 +7,4 @@ pub mod camera;
 pub mod hitable_list;
 pub mod mafsconsts;
 pub mod color_transforms;
+pub mod materials;

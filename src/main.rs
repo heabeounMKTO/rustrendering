@@ -16,8 +16,6 @@ fn main() {
 
 fn ray_color(r: Ray, world: &HitableList, depth: f64) -> Color{
     match world.hit(r, 0.001, INFINITY){
-        // if there is sphere , return normals
-
         
         Some(rec) =>{
             if (depth <= 0.0){
@@ -53,7 +51,7 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64) -> Color{
 
 
 fn render(){
-    const ASPECT_RATIO: f64 = 16.0/9.0;
+    const ASPECT_RATIO: f64 = 2.35;
     const HEIGHT: u32 = 400; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
     const SAMPLES: f64 = 100.0;
