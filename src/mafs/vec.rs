@@ -1,5 +1,7 @@
 use super::mafsconsts::{randomf64, randomf64_range};
-
+use super::color_transforms::*;
+use super::color::Pixel_color;
+use super::mafsconsts::*;
 #[derive(Copy,Clone,Debug)]
 pub struct Vec3{
     pub e: [f64; 3],
@@ -53,7 +55,25 @@ impl Vec3{
         let fuck: Vec3 = Vec3::random_in_unit_sphere();
         return Vec3::make_unit_vector(fuck);
     }
+    pub fn write_color(&self, pixel_color: Vec3 ,  samples: f64) -> Pixel_color{
+        let mut r: f64 = pixel_color.x();
+        let mut g: f64 = pixel_color.y();
+        let mut b: f64 = pixel_color.z();
 
+
+        let scale: f64 = 1.0 / samples;
+        //apply aces on linear color
+        // got transform func from shadertoy somewhere lol
+        r = apply_aces(scale * r);
+        g = apply_aces(scale * g);
+        b = apply_aces(scale * b);
+    
+
+        let pixel_r =  (256.0 * clamp(r, 0.0, 1.0)) as u32;
+        let pixel_g =  (256.0 * clamp(g, 0.0, 1.0)) as u32;
+        let pixel_b =  (256.0 * clamp(b, 0.0, 1.0)) as u32;
+        return Pixel_color { r: pixel_r, g: pixel_g, b: pixel_b };
+    }
     pub fn make_unit_vector(v : Vec3)->Vec3{
         v / v.length()
     }
