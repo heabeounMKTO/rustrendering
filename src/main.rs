@@ -59,7 +59,7 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64, max_depth: f64) -> Vec3{
 
 fn render(){
     const ASPECT_RATIO: f64 = 2.35;
-    const HEIGHT: u32 = 50; 
+    const HEIGHT: u32 = 200; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
     const SAMPLES: f64 = 50.0;
     const MAX_DEPTH: f64 = 10.0;
@@ -73,7 +73,8 @@ fn render(){
     world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.1, Box::new(Lambertian::new(Vec3::new(0.9,0.3,0.5))))));
     world.add(Box::new(Sphere::new(Vec3::new(0.4, 0.0, -1.4), 0.34, Box::new(Lambertian::new(Vec3::new(0.1,0.3,0.5))))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Lambertian::new(Vec3::new(0.95,0.93,0.93))))));
-
+    world.add(Box::new(Sphere::new(Vec3::new(-0.8, 0.1, -1.0), 0.4, Box::new(Lambertian::new(Vec3::new(0.5,0.93,0.3))))));
+    
     let cam: Camera = Camera::new(2.0,
                             ASPECT_RATIO*2.0,
                             Vec3::new(0.0,0.0,0.0),

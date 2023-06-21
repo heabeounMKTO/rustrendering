@@ -13,11 +13,17 @@ pub struct Lambertian{
     albedo: Vec3
 }
 
+pub struct Metal{
+    albedo: Vec3,
+    roughness: f64
+}
+
 impl Lambertian{
     pub fn new(albedo: Vec3) -> Self{
         return Lambertian{albedo};
     }
 }
+
 
 impl Material for Lambertian{
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord,
@@ -30,4 +36,8 @@ impl Material for Lambertian{
     fn clone(&self) -> Box<dyn Material>{
         return Box::new(Lambertian::new(self.albedo));
     }
+}
+
+pub fn refelct(v: Vec3, n: Vec3) -> Vec3{
+    return v - 2.0*Vec3::dot(&v, &n)*n;
 }
