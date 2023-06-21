@@ -10,7 +10,7 @@ use mafs::sphere::Sphere;
 use mafs::hitable::Hitable;
 
 use crate::mafs::color::Pixel_color;
-use crate::mafs::materials::Lambertian;
+use crate::mafs::materials::{Lambertian, Metal};
 use crate::mafs::ray;
 fn main() {
    render(); 
@@ -59,20 +59,20 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64, max_depth: f64) -> Vec3{
 
 fn render(){
     const ASPECT_RATIO: f64 = 2.35;
-    const HEIGHT: u32 = 200; 
+    const HEIGHT: u32 = 300; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
-    const SAMPLES: f64 = 50.0;
-    const MAX_DEPTH: f64 = 10.0;
+    const SAMPLES: f64 = 300.0;
+    const MAX_DEPTH: f64 = 30.0;
     //P3 framebuffer
     println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
     let mut world: HitableList = HitableList::new(4);
 
-    world.add(Box::new(Sphere::new(Vec3::new(4.2, 1.83, -3.0), 2.8, Box::new(Lambertian::new(Vec3::new(0.1,0.2,0.1))))));
+    world.add(Box::new(Sphere::new(Vec3::new(4.2, 1.83, -3.0), 2.8, Box::new(Metal::new(Vec3::new(0.1,0.2,0.1), 0.01)))));
     world.add(Box::new(Sphere::new(Vec3::new(-4.0, 1.53, -3.0), 1.8, Box::new(Lambertian::new(Vec3::new(0.3,0.8,0.88))))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Lambertian::new(Vec3::new(0.73,0.87,0.5))))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.1, Box::new(Lambertian::new(Vec3::new(0.9,0.3,0.5))))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.4, 0.0, -1.4), 0.34, Box::new(Lambertian::new(Vec3::new(0.1,0.3,0.5))))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Lambertian::new(Vec3::new(0.95,0.93,0.93))))));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.1, Box::new(Metal::new(Vec3::new(0.9,0.3,0.5), 0.23)))));
+    world.add(Box::new(Sphere::new(Vec3::new(0.4, 0.0, -1.4), 0.34, Box::new(Metal::new(Vec3::new(0.1,0.3,0.5), 0.9)))));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Metal::new(Vec3::new(0.95,0.93,0.93), 0.12)))));
     world.add(Box::new(Sphere::new(Vec3::new(-0.8, 0.1, -1.0), 0.4, Box::new(Lambertian::new(Vec3::new(0.5,0.93,0.3))))));
     
     let cam: Camera = Camera::new(2.0,
