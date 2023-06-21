@@ -1,16 +1,16 @@
-
-
+use super::materials::Material;
 use super::vec::Vec3;
 use super::hitable::*;
 use super::ray::*;
 pub struct Sphere{
     pub center: Vec3,
-    pub radius: f64
+    pub radius: f64,
+    pub material: Box<dyn Material>
 }
 
 impl Sphere{
-    pub fn new(center: Vec3, radius: f64) -> Sphere{
-        return Sphere{center, radius};
+    pub fn new(center: Vec3, radius: f64, material: Box<dyn Material>) -> Sphere{
+        return Sphere{center, radius, material};
     }
 }
 
@@ -27,14 +27,14 @@ impl Hitable for Sphere{
             let t = temp;
             let p = r.point_at_parameter(t);
             let normal = (p - self.center) / self.radius;
-            return Some(HitRecord{t, p, normal});
+            return Some(HitRecord{t, p, normal, material: self.material.clone()});
            };
            let temp = (-half_b + f64::sqrt(half_b*half_b-a*c))/a;
            if temp < t_max && temp > t_min{
             let t = temp;
             let p = r.point_at_parameter(t);
             let normal = (p - self.center) / self.radius;
-            return Some(HitRecord{t, p, normal});
+            return Some(HitRecord{t, p, normal, material: self.material.clone()});
            };
 
         }
