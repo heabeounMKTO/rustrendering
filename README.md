@@ -1,3 +1,4 @@
 # rustrendering
-just learning rust, i need a end goal, so there is motivation to learn, i decided to write a simple ray tracer by reading the wonderful
+a toy offline renderer , written in rust , for learning rust :D
+thanks in big part to this wonderful series 
 [ray tracing in one weekend series](https://raytracing.github.io/) by Peter Shirley
