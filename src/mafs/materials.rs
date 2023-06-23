@@ -1,5 +1,7 @@
+use std::mem::Discriminant;
+
 use super::hitable::HitRecord;
-use super::ray::Ray;
+use super::ray::{Ray, self};
 use super::vec::Vec3;
 use super::color::Color;
 
@@ -18,6 +20,16 @@ pub struct Metal{
     roughness: f64
 }
 
+pub struct Dialectric{
+    ref_index: f64,
+}
+
+impl Dialectric{
+    pub fn new(ref_index: f64) -> Self{
+        return Dialectric{ref_index: ref_index};
+    }
+}
+
 impl Lambertian{
     pub fn new(albedo: Vec3) -> Self{
         return Lambertian{albedo};
@@ -27,6 +39,12 @@ impl Lambertian{
 impl Metal{
     pub fn new(albedo: Vec3, roughness: f64) -> Self{
         return Metal { albedo: albedo, roughness: f64::min(roughness, 1.0)};
+    }
+}
+impl Material for Dialectric{
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> bool{
+       let outward_normal: Vec3;
+       let reflected: Vec3 = refelct(r_in.direction(), rec.normal); 
     }
 }
 
@@ -59,4 +77,17 @@ impl Material for Metal{
 
 pub fn refelct(v: Vec3, n: Vec3) -> Vec3{
     return v - 2.0*Vec3::dot(&v, &n)*n;
+}
+
+pub fn refract(v: Vec3, n: Vec3, ni_over_nt: f64, refracted: &mut Vec3) -> bool{
+    let uv: Vec3 = Vec3::make_unit_vector(v);
+    let dt: f64 = Vec3::dot(&uv, &n);
+    let discriminant = 1.0 - ni_over_nt*ni_over_nt*(1.0-dt*dt);
+    if discriminant > 0.0{
+        *refracted = ni_over_nt*(uv-n*dt) - n*f64::sqrt(discriminant);
+        return true;
+    }else{
+        return false;
+
+    }
 }
