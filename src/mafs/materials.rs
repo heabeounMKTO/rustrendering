@@ -1,6 +1,7 @@
 use std::mem::Discriminant;
 
 use super::hitable::HitRecord;
+use super::mafsconsts;
 use super::ray::{Ray, self};
 use super::vec::Vec3;
 use super::color::Color;
@@ -42,9 +43,44 @@ impl Metal{
     }
 }
 impl Material for Dialectric{
-    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> bool{
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool{
        let outward_normal: Vec3;
        let reflected: Vec3 = refelct(r_in.direction(), rec.normal); 
+       let ni_over_nt:f64;
+       *attenuation = Vec3::new(1.0,1.0,1.0);
+       let  mut refracted: Vec3 = Vec3::new(0.0,0.0,0.0);
+       let reflect_prob: f64;
+       let mut cosine: f64;
+       if Vec3::dot(&r_in.direction(), &rec.normal) > 0.0{
+            outward_normal = -rec.normal;
+            ni_over_nt = self.ref_index;
+
+            cosine = Vec3::dot(&r_in.direction(), &rec.normal) / r_in.direction().length();
+            cosine = f64::sqrt(1.0-self.ref_index*self.ref_index*(1.0-cosine*cosine));
+
+       }else{
+            outward_normal = rec.normal;
+            ni_over_nt = 1.0/self.ref_index;
+            cosine = -Vec3::dot(&r_in.direction(), &rec.normal) / r_in.direction().length();
+       }
+       if refract(r_in.direction(), outward_normal, ni_over_nt, &mut refracted){
+            reflect_prob = schlick(cosine, self.ref_index);
+       }else{
+        reflect_prob = 1.0;
+       }
+
+       if mafsconsts::randomf64() < reflect_prob{
+         *scattered = Ray::new(rec.p, reflected);
+
+       } else{
+        *scattered = Ray::new(rec.p, refracted);
+       }
+
+       return true;
+    }
+
+    fn clone(&self) -> Box<dyn Material>{
+        return Box::new(Dialectric::new(self.ref_index));
     }
 }
 
@@ -78,6 +114,13 @@ impl Material for Metal{
 pub fn refelct(v: Vec3, n: Vec3) -> Vec3{
     return v - 2.0*Vec3::dot(&v, &n)*n;
 }
+
+pub fn schlick(cosine: f64, ref_index: f64) -> f64{
+    let mut r0 = (1.0 - ref_index) / (1.0 + ref_index);
+    r0 = r0*r0;
+    return r0 + (1.0 - r0)*f64::powi(1.0-cosine, 5)
+}
+
 
 pub fn refract(v: Vec3, n: Vec3, ni_over_nt: f64, refracted: &mut Vec3) -> bool{
     let uv: Vec3 = Vec3::make_unit_vector(v);

@@ -10,7 +10,7 @@ use mafs::sphere::Sphere;
 use mafs::hitable::Hitable;
 
 use crate::mafs::color::Pixel_color;
-use crate::mafs::materials::{Lambertian, Metal};
+use crate::mafs::materials::{Lambertian, Metal, Dialectric};
 use crate::mafs::ray;
 fn main() {
    render(); 
@@ -69,7 +69,8 @@ fn render(){
 
     world.add(Box::new(Sphere::new(Vec3::new(4.2, 1.83, -3.0), 2.8, Box::new(Metal::new(Vec3::new(0.1,0.2,0.1), 0.01)))));
     world.add(Box::new(Sphere::new(Vec3::new(-4.0, 1.53, -3.0), 1.8, Box::new(Lambertian::new(Vec3::new(0.99,0.99,0.99))))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Lambertian::new(Vec3::new(0.73,0.87,0.5))))));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Dialectric::new(1.45)))));
+    world.add(Box::new(Sphere::new(Vec3::new(0.05, 0.05, 0.5), 0.4, Box::new(Dialectric::new(1.33)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.245, Box::new(Metal::new(Vec3::new(0.9,0.3,0.5), 0.23)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.4, 0.0, -1.4), 0.34, Box::new(Metal::new(Vec3::new(0.1,0.3,0.5), 0.9)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Metal::new(Vec3::new(0.95,1.0,0.93), 0.04)))));
