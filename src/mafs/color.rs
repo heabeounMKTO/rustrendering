@@ -1,4 +1,3 @@
-use super::vec::Vec3;
 use super::mafsconsts::clamp;
 use super::color_transforms::*;
 #[derive(Copy, Clone, Debug)]
