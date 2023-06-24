@@ -59,18 +59,18 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64, max_depth: f64) -> Vec3{
 
 fn render(){
     const ASPECT_RATIO: f64 = 2.35;
-    const HEIGHT: u32 = 250; 
+    const HEIGHT: u32 = 400; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
-    const SAMPLES: f64 = 100.0;
-    const MAX_DEPTH: f64 = 20.0;
+    const SAMPLES: f64 = 300.0;
+    const MAX_DEPTH: f64 = 30.0;
     //P3 framebuffer
     println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
     let mut world: HitableList = HitableList::new(4);
 
     world.add(Box::new(Sphere::new(Vec3::new(4.2, 1.83, -3.0), 2.8, Box::new(Metal::new(Vec3::new(0.1,0.2,0.1), 0.01)))));
     world.add(Box::new(Sphere::new(Vec3::new(-4.0, 1.53, -3.0), 1.8, Box::new(Lambertian::new(Vec3::new(0.99,0.99,0.99))))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Dialectric::new(1.45)))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.05, 0.05, 0.5), 0.4, Box::new(Dialectric::new(1.33)))));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Dialectric::new(1.45, Vec3::new(1.0,1.0, 1.0), 0.01)))));
+    world.add(Box::new(Sphere::new(Vec3::new(-2.0, 0.05, -1.2), 0.4, Box::new(Dialectric::new(1.4, Vec3::new(0.1,0.7, 0.99), 0.3)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.245, Box::new(Metal::new(Vec3::new(0.9,0.3,0.5), 0.23)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.4, 0.0, -1.4), 0.34, Box::new(Metal::new(Vec3::new(0.1,0.3,0.5), 0.9)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Metal::new(Vec3::new(0.95,1.0,0.93), 0.04)))));
