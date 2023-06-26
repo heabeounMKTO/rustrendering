@@ -1,13 +1,10 @@
 use super::{vec::Vec3, ray::Ray, mafsconsts};
 
 pub struct Camera{
-    pub view_h: f64,
-    pub view_w: f64,
-    pub origin: Vec3,
-    pub focal_length: f64,
-    pub horizontal: Vec3,
-    pub vertical: Vec3,
-    pub lower_left_c: Vec3,
+    origin: Vec3,
+    lower_left_c: Vec3,
+    vertical: Vec3,
+    horizontal: Vec3,
     u: Vec3,
     v: Vec3,
     w: Vec3
@@ -19,21 +16,26 @@ impl Camera{
               vup: Vec3, 
               vfov: f64,
               aspect: f64 
-               ) -> Camera{
+               ) -> Self{
                let theta = vfov*mafsconsts::PI / 180.0;
-               let horizontal: Vec3 = Vec3::new(view_w,0.0,0.0);
-               let vertical: Vec3 = Vec3::new(0.0, view_h, 0.0);
-               let lower_left_corner = origin - horizontal/2.0 - vertical/2.0 - Vec3::new(0.0, 0.0, focal_length);
-               
+               let half_height = f64::tan(theta/2.0);
+               let half_width = aspect*half_height;
+               let origin = look_from;
+               let w = Vec3::make_unit_vector(look_from-look_at);
+               let u = Vec3::make_unit_vector(Vec3::cross(vup, w));
+               let v = Vec3::cross(w,u);
+               let mut lower_left_corner = Vec3::new(-half_width, -half_height, -1.0);
+               let horizontal = 2.0*half_width*u;
+               let vertical = 2.0*half_height*v;
                
                return Camera{
-                    view_h: view_h,
-                    view_w: view_w,
                     origin: origin,
-                    focal_length: focal_length,
+                    lower_left_c: lower_left_corner,
                     horizontal: horizontal,
                     vertical: vertical,
-                    lower_left_c: lower_left_corner,
+                    u: u,
+                    v: v,
+                    w: w
                 };
                } 
     pub fn get_ray(&self,u: f64, v: f64) -> Ray{
