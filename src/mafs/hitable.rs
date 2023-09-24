@@ -20,6 +20,6 @@ use super::materials::Material;
 //     }
 
 //  }
- pub trait Hitable{
+ pub trait Hitable {
     fn hit(&self, t: Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
  }

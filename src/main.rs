@@ -1,5 +1,6 @@
 pub mod mafs;
 use std::char::MAX;
+use rayon::prelude::*;
 
 use mafs::hitable::HitRecord;
 use mafs::{vec::Vec3, ray::Ray, 
@@ -61,8 +62,8 @@ fn render(){
     const ASPECT_RATIO: f64 = 2.35;
     const HEIGHT: u32 = 400; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
-    const SAMPLES: f64 = 20.0;
-    const MAX_DEPTH: f64 = 10.0;
+    const SAMPLES: u32 = 150;
+    const MAX_DEPTH: f64 = 20.0;
     //P3 framebuffer
     println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
     let mut world: HitableList = HitableList::new(4);
@@ -77,23 +78,34 @@ fn render(){
     world.add(Box::new(Sphere::new(Vec3::new(-0.8, 0.2, -1.0), 0.4, Box::new(Lambertian::new(Vec3::new(0.5,0.93,0.3))))));
 
     let cam = Camera::new(
-      Vec3::new(-8.0, 1.0, 1.0),
-      Vec3::new(0.0, 0.0, 0.0),
+      Vec3::new(2.0, 1.0, 1.0),
       Vec3::new(0.0, 1.0, 0.0),
-      120.0, 
+      Vec3::new(0.0, 1.0, 0.0),
+      90.0, 
       WIDTH as f64/HEIGHT as f64
     );   
 
     for j in(0..HEIGHT).rev(){
         for i in 0..WIDTH{
             let mut wcol: Vec3 = Vec3::new(0.0,0.0,0.0);
-            let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 }; 
+            let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 };
+            // let mut penis: u32;
+            // (0..SAMPLES).into_par_iter()
+            //     .for_each(|_penis| {
+            //         let u: f64 = (i as f64 + randomf64())/(WIDTH-1) as f64;
+            //         let v: f64 = (j as f64 + randomf64())/(HEIGHT-1) as f64;
+            //         let r: Ray = cam.get_ray(u, v);
+            //         wcol += ray_color(r, &world, 0.0, MAX_DEPTH);
+            //         final_color = wcol.write_color(wcol,SAMPLES as f64); 
+            //     }
+                
+            // );
             for _samples in 0..SAMPLES as u32{
                 let u: f64 = (i as f64 + randomf64())/(WIDTH-1) as f64;
                 let v: f64 = (j as f64 + randomf64())/(HEIGHT-1) as f64;
                 let r: Ray = cam.get_ray(u, v);
                 wcol += ray_color(r, &world, 0.0, MAX_DEPTH); 
-                final_color = wcol.write_color(wcol,SAMPLES);
+                final_color = wcol.write_color(wcol,SAMPLES as f64);
             }
             
             println!("{:?} {:?} {:?}", final_color.r , final_color.g ,final_color.b);
