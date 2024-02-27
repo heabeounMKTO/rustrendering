@@ -90,23 +90,6 @@ fn render() -> ImageBuffer<Rgb<u8>, Vec<u8>>{
     let prog_samp = HEIGHT.clone() * WIDTH.clone() * SAMPLES.clone();
     let bar = ProgressBar::new(prog_samp as u64);
     let mut buffer: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
-    // for j in(0..HEIGHT).rev(){
-    //     for i in 0..WIDTH{
-    //         let mut wcol: Vec3 = Vec3::new(0.0,0.0,0.0);
-    //         let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 };
-    //         for _samples in 0..SAMPLES as u32{
-    //             
-    //             bar.inc(1);
-    //             let u: f64 = (i as f64 + randomf64())/(WIDTH-1) as f64;
-    //             let v: f64 = (j as f64 + randomf64())/(HEIGHT-1) as f64;
-    //             let r: Ray = cam.get_ray(u, v);
-    //             wcol += ray_color(r, &world, 0.0, MAX_DEPTH); 
-    //             final_color = wcol.write_color(wcol,SAMPLES as f64);
-    //         }
-    //         println!("{:?} {:?} {:?}", final_color.r , final_color.g ,final_color.b);
-    //     }
-    // }
-    
     for(i,j,pixel) in buffer.enumerate_pixels_mut() {
             let mut wcol: Vec3 = Vec3::new(0.0,0.0,0.0);
             let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 };
@@ -120,10 +103,6 @@ fn render() -> ImageBuffer<Rgb<u8>, Vec<u8>>{
                 final_color = wcol.write_color(wcol,SAMPLES as f64);
                 *pixel = Rgb([final_color.r as u8, final_color.g as u8, final_color.b as u8]);
         }
-        // match buffer.save("preview.png") {
-        //     Err(e) => eprintln!("Error writing file: {}", e),
-        //     Ok(()) => println!("rendering finished!")
-        // };
     }
 
 
