@@ -1,5 +1,6 @@
 pub mod mafs;
 use std::char::MAX;
+use image::{RgbImage, ImageBuffer, Rgb};
 use rayon::prelude::*;
 use indicatif::ProgressBar;
 
@@ -10,14 +11,16 @@ use mafs::{vec::Vec3, ray::Ray,
 use mafs::{hitable_list::*, mafsconsts::*};
 use mafs::sphere::Sphere;
 use mafs::hitable::Hitable;
-
 use crate::mafs::color::Pixel_color;
 use crate::mafs::materials::{Lambertian, Metal, Dialectric};
 use crate::mafs::ray;
 fn main() {
-   render(); 
+   let img: ImageBuffer<Rgb<u8>, Vec<u8>> = render(); 
+    match img.save("preview.png") {
+    Err(e) => eprintln!("Error writing file: {}", e),
+    Ok(()) => println!("rendering finished!")
+    };
 }
-
 
 fn ray_color(r: Ray, world: &HitableList, depth: f64, max_depth: f64) -> Vec3{
     match world.hit(r, 0.001, INFINITY){
@@ -57,18 +60,17 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64, max_depth: f64) -> Vec3{
     } 
 } 
 
-
-
-fn render(){
+fn render() -> ImageBuffer<Rgb<u8>, Vec<u8>>{
     const ASPECT_RATIO: f64 = 2.35;
     const HEIGHT: u32 = 400; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
     const SAMPLES: u32 = 20;
     const MAX_DEPTH: f64 = 20.0;
     //P3 framebuffer
-    println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
+    // println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
     let mut world: HitableList = HitableList::new(4);
-   
+  
+    // objects 
     world.add(Box::new(Sphere::new(Vec3::new(4.2, 1.83, -3.0), 2.8, Box::new(Metal::new(Vec3::new(0.1,0.2,0.1), 0.01)))));
     world.add(Box::new(Sphere::new(Vec3::new(-4.0, 1.53, -3.0), 1.8, Box::new(Lambertian::new(Vec3::new(0.99,0.99,0.99))))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Dialectric::new(1.45, Vec3::new(1.0,1.0, 1.0), 0.01)))));
@@ -87,8 +89,25 @@ fn render(){
     );   
     let prog_samp = HEIGHT.clone() * WIDTH.clone() * SAMPLES.clone();
     let bar = ProgressBar::new(prog_samp as u64);
-    for j in(0..HEIGHT).rev(){
-        for i in 0..WIDTH{
+    let mut buffer: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
+    // for j in(0..HEIGHT).rev(){
+    //     for i in 0..WIDTH{
+    //         let mut wcol: Vec3 = Vec3::new(0.0,0.0,0.0);
+    //         let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 };
+    //         for _samples in 0..SAMPLES as u32{
+    //             
+    //             bar.inc(1);
+    //             let u: f64 = (i as f64 + randomf64())/(WIDTH-1) as f64;
+    //             let v: f64 = (j as f64 + randomf64())/(HEIGHT-1) as f64;
+    //             let r: Ray = cam.get_ray(u, v);
+    //             wcol += ray_color(r, &world, 0.0, MAX_DEPTH); 
+    //             final_color = wcol.write_color(wcol,SAMPLES as f64);
+    //         }
+    //         println!("{:?} {:?} {:?}", final_color.r , final_color.g ,final_color.b);
+    //     }
+    // }
+    
+    for(i,j,pixel) in buffer.enumerate_pixels_mut() {
             let mut wcol: Vec3 = Vec3::new(0.0,0.0,0.0);
             let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 };
             for _samples in 0..SAMPLES as u32{
@@ -99,10 +118,15 @@ fn render(){
                 let r: Ray = cam.get_ray(u, v);
                 wcol += ray_color(r, &world, 0.0, MAX_DEPTH); 
                 final_color = wcol.write_color(wcol,SAMPLES as f64);
-            }
-            println!("{:?} {:?} {:?}", final_color.r , final_color.g ,final_color.b);
+                *pixel = Rgb([final_color.r as u8, final_color.g as u8, final_color.b as u8]);
         }
+        // match buffer.save("preview.png") {
+        //     Err(e) => eprintln!("Error writing file: {}", e),
+        //     Ok(()) => println!("rendering finished!")
+        // };
     }
 
+
     bar.finish();
+    buffer
 }
