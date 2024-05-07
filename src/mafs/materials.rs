@@ -23,11 +23,14 @@ pub struct Metal{
 
 pub struct Dialectric{
     ref_index: f64,
+    albedo: Vec3,
+    roughness: f64
 }
 
+
 impl Dialectric{
-    pub fn new(ref_index: f64) -> Self{
-        return Dialectric{ref_index: ref_index};
+    pub fn new(ref_index: f64, albedo: Vec3, roughness: f64) -> Self{
+        return Dialectric{ref_index: ref_index, albedo: albedo, roughness: roughness};
     }
 }
 
@@ -47,7 +50,7 @@ impl Material for Dialectric{
        let outward_normal: Vec3;
        let reflected: Vec3 = refelct(r_in.direction(), rec.normal); 
        let ni_over_nt:f64;
-       *attenuation = Vec3::new(1.0,1.0,1.0);
+       *attenuation = self.albedo;
        let  mut refracted: Vec3 = Vec3::new(0.0,0.0,0.0);
        let reflect_prob: f64;
        let mut cosine: f64;
@@ -70,17 +73,17 @@ impl Material for Dialectric{
        }
 
        if mafsconsts::randomf64() < reflect_prob{
-         *scattered = Ray::new(rec.p, reflected);
+         *scattered = Ray::new(rec.p, reflected+self.roughness*Vec3::random_in_unit_sphere());
 
        } else{
-        *scattered = Ray::new(rec.p, refracted);
+        *scattered = Ray::new(rec.p, refracted+self.roughness*Vec3::random_in_unit_sphere());
        }
 
        return true;
     }
 
     fn clone(&self) -> Box<dyn Material>{
-        return Box::new(Dialectric::new(self.ref_index));
+        return Box::new(Dialectric::new(self.ref_index, self.albedo, self.roughness));
     }
 }
 

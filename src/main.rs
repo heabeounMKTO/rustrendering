@@ -1,5 +1,8 @@
 pub mod mafs;
 use std::char::MAX;
+use image::{RgbImage, ImageBuffer, Rgb};
+use rayon::prelude::*;
+use indicatif::ProgressBar;
 
 use mafs::hitable::HitRecord;
 use mafs::{vec::Vec3, ray::Ray, 
@@ -8,14 +11,16 @@ use mafs::{vec::Vec3, ray::Ray,
 use mafs::{hitable_list::*, mafsconsts::*};
 use mafs::sphere::Sphere;
 use mafs::hitable::Hitable;
-
 use crate::mafs::color::Pixel_color;
 use crate::mafs::materials::{Lambertian, Metal, Dialectric};
 use crate::mafs::ray;
 fn main() {
-   render(); 
+   let img: ImageBuffer<Rgb<u8>, Vec<u8>> = render(); 
+    match img.save("preview.png") {
+    Err(e) => eprintln!("Error writing file: {}", e),
+    Ok(()) => println!("rendering finished!")
+    };
 }
-
 
 fn ray_color(r: Ray, world: &HitableList, depth: f64, max_depth: f64) -> Vec3{
     match world.hit(r, 0.001, INFINITY){
@@ -55,44 +60,52 @@ fn ray_color(r: Ray, world: &HitableList, depth: f64, max_depth: f64) -> Vec3{
     } 
 } 
 
-
-
-fn render(){
+fn render() -> ImageBuffer<Rgb<u8>, Vec<u8>>{
     const ASPECT_RATIO: f64 = 2.35;
-    const HEIGHT: u32 = 250; 
+    const HEIGHT: u32 = 400; 
     const WIDTH: u32 = (HEIGHT as f64 * (ASPECT_RATIO) ) as u32;
-    const SAMPLES: f64 = 100.0;
+    const SAMPLES: u32 = 20;
     const MAX_DEPTH: f64 = 20.0;
     //P3 framebuffer
-    println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
+    // println!("P3\n{} {}\n255\n", WIDTH, HEIGHT);
     let mut world: HitableList = HitableList::new(4);
-
+  
+    // objects 
     world.add(Box::new(Sphere::new(Vec3::new(4.2, 1.83, -3.0), 2.8, Box::new(Metal::new(Vec3::new(0.1,0.2,0.1), 0.01)))));
     world.add(Box::new(Sphere::new(Vec3::new(-4.0, 1.53, -3.0), 1.8, Box::new(Lambertian::new(Vec3::new(0.99,0.99,0.99))))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Dialectric::new(1.45)))));
-    world.add(Box::new(Sphere::new(Vec3::new(0.05, 0.05, 0.5), 0.4, Box::new(Dialectric::new(1.33)))));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, 1.0, -3.0), 1.2, Box::new(Dialectric::new(1.45, Vec3::new(1.0,1.0, 1.0), 0.01)))));
+    world.add(Box::new(Sphere::new(Vec3::new(-2.0, 0.05, -1.2), 0.4, Box::new(Dialectric::new(1.4, Vec3::new(0.1,0.7, 0.99), 0.3)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.245, Box::new(Metal::new(Vec3::new(0.9,0.3,0.5), 0.23)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.4, 0.0, -1.4), 0.34, Box::new(Metal::new(Vec3::new(0.1,0.3,0.5), 0.9)))));
     world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Metal::new(Vec3::new(0.95,1.0,0.93), 0.04)))));
-    world.add(Box::new(Sphere::new(Vec3::new(-0.8, 0.1, -1.0), 0.4, Box::new(Lambertian::new(Vec3::new(0.5,0.93,0.3))))));
-    
-    let cam: Camera = Camera::new(2.0,
-                            ASPECT_RATIO*2.0,
-                            Vec3::new(0.0,0.0,0.0),
-                            1.0);
-    for j in(0..HEIGHT).rev(){
-        for i in 0..WIDTH{
+    world.add(Box::new(Sphere::new(Vec3::new(-0.8, 0.2, -1.0), 0.4, Box::new(Lambertian::new(Vec3::new(0.5,0.93,0.3))))));
+
+    let cam = Camera::new(
+      Vec3::new(2.0, 1.0, 1.0),
+      Vec3::new(0.0, 1.0, 0.0),
+      Vec3::new(0.0, 1.0, 0.0),
+      90.0, 
+      WIDTH as f64/HEIGHT as f64
+    );   
+    let prog_samp = HEIGHT.clone() * WIDTH.clone() * SAMPLES.clone();
+    let bar = ProgressBar::new(prog_samp as u64);
+    let mut buffer: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
+    for(i,j,pixel) in buffer.enumerate_pixels_mut() {
             let mut wcol: Vec3 = Vec3::new(0.0,0.0,0.0);
-            let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 }; 
+            let mut final_color: Pixel_color = Pixel_color { r: 0, g: 0, b: 0 };
             for _samples in 0..SAMPLES as u32{
+                
+                bar.inc(1);
                 let u: f64 = (i as f64 + randomf64())/(WIDTH-1) as f64;
                 let v: f64 = (j as f64 + randomf64())/(HEIGHT-1) as f64;
                 let r: Ray = cam.get_ray(u, v);
                 wcol += ray_color(r, &world, 0.0, MAX_DEPTH); 
-                final_color = wcol.write_color(wcol,SAMPLES);
-            }
-            
-            println!("{:?} {:?} {:?}", final_color.r , final_color.g ,final_color.b);
+                final_color = wcol.write_color(wcol,SAMPLES as f64);
+                *pixel = Rgb([final_color.r as u8, final_color.g as u8, final_color.b as u8]);
         }
     }
+
+
+    bar.finish();
+    buffer
 }

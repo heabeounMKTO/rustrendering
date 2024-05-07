@@ -40,6 +40,14 @@ impl Vec3{
                       randomf64_range(min,max)]};
     }
 
+    pub fn cross(v1: Vec3, v2: Vec3) -> Vec3{
+        Vec3::new(
+            v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1],
+            -(v1.e[0] * v2.e[2] - v1.e[2] * v2.e[0]),
+            v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0]
+        )
+    }
+
     pub fn random_in_unit_sphere() -> Vec3{
         let p: Vec3; 
        loop{
